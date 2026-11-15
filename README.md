@@ -99,3 +99,8 @@ After a tagged prerelease is published, get a prebuilt Linux/Windows binary from
 ## Functional validation
 
 Start with [the WSL pilot](docs/guides/wsl-pilot.md) on a clean repository and an existing test issue. The opt-in `--execute` path invokes installed `gh` and `opencode` locally; BMAD execution is **not** implemented. [Terminal demo](docs/guides/terminal-demo.md) uses synthetic data only.
+
+
+## Documentation brand alignment
+
+The Docusaurus UI follows the design tokens in `stefanposs/sp-website-blog` (`data/theme.json`): primary navy `#122E53`, white and light-grey surfaces, Heebo body text, and Signika headings. The style source is intentionally kept separate from website code; the documentation remains a standalone static Docusaurus build. After merging a theme change, GitHub Actions must successfully rebuild and deploy `docs/site/` for it to appear on GitHub Pages.
