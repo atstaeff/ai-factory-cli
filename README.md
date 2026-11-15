@@ -94,7 +94,7 @@ The Markdown sources remain in `docs/`; generated static HTML is placed in `docs
 
 ## Native binaries (no Go required)
 
-After a tagged prerelease is published, get a prebuilt Linux/Windows binary from [GitHub Releases](https://github.com/atstaeff/ai-factory-cli/releases). Install instructions for WSL and PowerShell: [release guide](docs/guides/releases.md). Native binary users can run `factory scan .`, `factory processes .` and `factory tools` without a Go toolchain. The `examples/` directory is not embedded in the binary.
+After a tagged prerelease is published, get a prebuilt macOS/Linux/Windows binary from [GitHub Releases](https://github.com/atstaeff/ai-factory-cli/releases). Install instructions for WSL and PowerShell: [release guide](docs/guides/releases.md). Native binary users can run `factory scan .`, `factory processes .` and `factory tools` without a Go toolchain. The `examples/` directory is not embedded in the binary.
 
 ## Functional validation
 
