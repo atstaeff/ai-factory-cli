@@ -66,7 +66,13 @@ Expand-Archive .\factory_vX.Y.Z_windows_amd64.zip -DestinationPath .\factory-dis
 
 Replace `vX.Y.Z` with the exact published release version. For convenience, put the extracted executable on your `PATH` according to your enterprise workstation policy.
 
-## Maintainer release procedure
+## Publish the first release without local Git or Go
+
+After the manual-release workflow is merged into `main`, open [Release CLI binaries on GitHub Actions](https://github.com/atstaeff/ai-factory-cli/actions/workflows/release.yml), select **Run workflow**, choose **main**, enter `v0.1.0-rc.1`, and start it. The workflow runs Go tests on GitHub's runner, cross-compiles all six archives, verifies files, creates the tag on the selected main commit, and publishes a prerelease with SHA256SUMS. Check the run's publish job for success; this is not automatic when merging a PR.
+
+Only use a version that does not already exist. If the workflow fails, inspect its logs before attempting a new release. The action is restricted to the reviewed `main` branch.
+
+## Maintainer release procedure (Git CLI alternative)
 
 First merge the release workflow to `main` and ensure it passes CI. Then create a reviewed annotated SemVer tag on the exact approved commit:
 
