@@ -46,7 +46,7 @@ jobs:
             VERSION="${INPUT_VERSION}"
           elif [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
             # One-time bootstrap: this workflow file changed on main.
-            VERSION="v0.1.0-rc.1"
+            VERSION="v0.1.0-rc.2"
           else
             VERSION="${GITHUB_REF_NAME}"
           fi
@@ -118,11 +118,7 @@ jobs:
           set -euo pipefail
           # Publish only from reviewed, existing Git tags. Never overwrite releases.
           if gh release view "${VERSION}" >/dev/null 2>&1; then
-            if [[ "${GITHUB_REF}" == "refs/heads/main" && "${GITHUB_EVENT_NAME}" == "push" ]]; then
-              echo "Bootstrap prerelease ${VERSION} already exists; nothing to do."
-              exit 0
-            fi
-            echo "Release ${VERSION} already exists; refusing to overwrite" >&2
+            echo "::error::Release ${VERSION} already exists; refusing to replace published assets."
             exit 1
           fi
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" || "${GITHUB_REF}" == "refs/heads/main" ]]; then
@@ -132,7 +128,17 @@ jobs:
               echo "Tag ${VERSION} already exists; refusing to create a new release against an existing tag in this mode." >&2
               exit 1
             fi
-            gh release create "${VERSION}" dist/* --prerelease --generate-notes --title "Factory ${VERSION}" --target "${GITHUB_SHA}"
+            gh release create "${VERSION}" dist/* --draft --prerelease --generate-notes --title "Factory ${VERSION}" --target "${GITHUB_SHA}"
           else
-            gh release create "${VERSION}" dist/* --prerelease --generate-notes --title "Factory ${VERSION}" --verify-tag
+            gh release create "${VERSION}" dist/* --draft --prerelease --generate-notes --title "Factory ${VERSION}" --verify-tag
           fi
+
+          echo "Verifying that every expected release archive and SHA256SUMS were uploaded"
+          mapfile -t expected < <(find dist -maxdepth 1 -type f -printf '%f\n' | sort)
+          mapfile -t actual < <(gh api "repos/${GH_REPO}/releases/tags/${VERSION}" --jq '.assets[].name' | sort)
+          printf 'Expected:\n%s\nUploaded:\n%s\n' "${expected[*]}" "${actual[*]}"
+          [[ "${#expected[@]}" -eq 7 ]] || { echo "::error::Expected six binary archives and SHA256SUMS in dist"; exit 1; }
+          diff -u <(printf '%s\n' "${expected[@]}") <(printf '%s\n' "${actual[@]}")
+          gh release edit "${VERSION}" --draft=false
+          gh release view "${VERSION}" --json isDraft,isPrerelease --jq 'if .isDraft == false and .isPrerelease == true then "Verified: published prerelease" else error("release did not publish") end'
+          echo "Published https://github.com/${GH_REPO}/releases/tag/${VERSION}"
