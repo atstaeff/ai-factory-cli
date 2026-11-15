@@ -11,7 +11,11 @@ title: Roadmap
 | Read-only local scan | Implemented |
 | PROCESS.md discovery | Implemented (name only) |
 | Minimal doctor and status | Implemented |
-| Docusaurus documentation | Proposed in this PR |
+| Docusaurus documentation | Implemented; verify deployment separately |
+| Binary release workflow | Implemented in this PR; publication requires a tagged release |
+| Tool executable diagnostics | Implemented |
+| OpenCode / GitHub issue analysis pilot | Implemented; real WSL acceptance testing pending |
+| Synthetic terminal demo | Implemented (not real telemetry) |
 | Validated process schema | Planned |
 | Brownfield onboarding, updates and offboarding | Planned |
 | BMAD/OpenSpec runtime integration | Planned |
