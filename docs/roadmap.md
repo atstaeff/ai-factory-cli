@@ -11,7 +11,9 @@ title: Roadmap
 | Read-only local scan | Implemented |
 | PROCESS.md discovery | Implemented (name only) |
 | Minimal doctor and status | Implemented |
-| Docusaurus documentation | Proposed in this PR |
+| Docusaurus documentation | Implemented (build must be verified in CI) |
+| Cross-platform binary packaging | Release workflow added; publication pending tag and CI |
+| Read-only CLI availability diagnostics | Implemented |
 | Validated process schema | Planned |
 | Brownfield onboarding, updates and offboarding | Planned |
 | BMAD/OpenSpec runtime integration | Planned |
