@@ -17,3 +17,12 @@ jobs:
           go-version-file: go.mod
       - run: go test ./...
       - run: go vet ./...
+      - name: Smoke-test cross-compilation
+        shell: bash
+        run: |
+          set -euo pipefail
+          for target in linux/amd64 linux/arm64 windows/amd64 windows/arm64; do
+            GOOS="${target%/*}"
+            GOARCH="${target#*/}"
+            CGO_ENABLED=0 GOOS="$GOOS" GOARCH="$GOARCH" go build -trimpath -buildvcs=false -o "$RUNNER_TEMP/factory-$GOOS-$GOARCH" ./cmd/factory
+          done
