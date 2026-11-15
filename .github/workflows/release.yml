@@ -116,29 +116,41 @@ jobs:
           VERSION: ${{ needs.verify-and-build.outputs.version }}
         run: |
           set -euo pipefail
-          # Publish only from reviewed, existing Git tags. Never overwrite releases.
-          if gh release view "${VERSION}" >/dev/null 2>&1; then
-            echo "::error::Release ${VERSION} already exists; refusing to replace published assets."
+          # Never trust a tag alone: release drafts do not resolve via /releases/tags/{tag}.
+          # Find the existing draft by release ID so an earlier failed run can recover.
+          mapfile -t existing_ids < <(gh api "repos/${GH_REPO}/releases?per_page=100" --jq ".[] | select(.tag_name == \"${VERSION}\") | .id")
+          if [[ "${#existing_ids[@]}" -gt 1 ]]; then
+            echo "::error::Multiple releases have tag ${VERSION}; refusing to guess."
             exit 1
           fi
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" || "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            # Create a new tag pointing at the reviewed main commit.
-            # GITHUB_TOKEN-created tags do not retrigger the tag workflow.
-            if git ls-remote --tags "https://github.com/${GH_REPO}.git" "refs/tags/${VERSION}" | grep -q .; then
-              echo "Tag ${VERSION} already exists; refusing to create a new release against an existing tag in this mode." >&2
-              exit 1
-            fi
-            gh release create "${VERSION}" dist/* --draft --prerelease --generate-notes --title "Factory ${VERSION}" --target "${GITHUB_SHA}"
+          if [[ "${#existing_ids[@]}" -eq 1 ]]; then
+            release_id="${existing_ids[0]}"
+            is_draft="$(gh api "repos/${GH_REPO}/releases/${release_id}" --jq .draft)"
+            echo "Found existing release ID ${release_id} (draft=${is_draft}); checking assets."
           else
-            gh release create "${VERSION}" dist/* --draft --prerelease --generate-notes --title "Factory ${VERSION}" --verify-tag
+            if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" || "${GITHUB_REF}" == "refs/heads/main" ]]; then
+              if git ls-remote --tags "https://github.com/${GH_REPO}.git" "refs/tags/${VERSION}" | grep -q .; then
+                echo "::error::Tag ${VERSION} exists without a matching release; inspect before retrying."
+                exit 1
+              fi
+              gh release create "${VERSION}" dist/* --draft --prerelease --generate-notes --title "Factory ${VERSION}" --target "${GITHUB_SHA}"
+            else
+              gh release create "${VERSION}" dist/* --draft --prerelease --generate-notes --title "Factory ${VERSION}" --verify-tag
+            fi
+            mapfile -t created_ids < <(gh api "repos/${GH_REPO}/releases?per_page=100" --jq ".[] | select(.tag_name == \"${VERSION}\") | .id")
+            [[ "${#created_ids[@]}" -eq 1 ]] || { echo "::error::Draft release was not discoverable by release ID"; exit 1; }
+            release_id="${created_ids[0]}"
+            is_draft="true"
           fi
 
-          echo "Verifying that every expected release archive and SHA256SUMS were uploaded"
+          echo "Checking that all six binaries and SHA256SUMS exist on release ID ${release_id}"
           mapfile -t expected < <(find dist -maxdepth 1 -type f -printf '%f\n' | sort)
-          mapfile -t actual < <(gh api "repos/${GH_REPO}/releases/tags/${VERSION}" --jq '.assets[].name' | sort)
-          printf 'Expected:\n%s\nUploaded:\n%s\n' "${expected[*]}" "${actual[*]}"
-          [[ "${#expected[@]}" -eq 7 ]] || { echo "::error::Expected six binary archives and SHA256SUMS in dist"; exit 1; }
+          mapfile -t actual < <(gh api "repos/${GH_REPO}/releases/${release_id}" --jq '.assets[].name' | sort)
+          [[ "${#expected[@]}" -eq 7 ]] || { echo "::error::Expected six binary archives plus SHA256SUMS"; exit 1; }
           diff -u <(printf '%s\n' "${expected[@]}") <(printf '%s\n' "${actual[@]}")
-          gh release edit "${VERSION}" --draft=false
-          gh release view "${VERSION}" --json isDraft,isPrerelease --jq 'if .isDraft == false and .isPrerelease == true then "Verified: published prerelease" else error("release did not publish") end'
+          if [[ "${is_draft}" == "true" ]]; then
+            echo "Publishing validated draft release ${release_id}"
+            gh api --method PATCH "repos/${GH_REPO}/releases/${release_id}" -F draft=false >/dev/null
+          fi
+          gh api "repos/${GH_REPO}/releases/${release_id}" --jq 'if .draft == false and .prerelease == true then "Verified: published prerelease" else error("release not published as prerelease") end'
           echo "Published https://github.com/${GH_REPO}/releases/tag/${VERSION}"
