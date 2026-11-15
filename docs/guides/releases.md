@@ -105,3 +105,8 @@ For troubleshooting with an authenticated GitHub CLI:
 ~~~bash
 gh release view v0.1.0-rc.2 --repo atstaeff/ai-factory-cli --json isDraft,isPrerelease,assets
 ~~~
+
+
+### Recovering an existing draft
+
+The initial `v0.1.0-rc.2` publication created an **untagged draft release** with uploaded archives but failed to query it by tag (GitHub returned HTTP 404). The repaired release workflow finds the draft by release **ID**, compares every attached asset with the freshly built distribution, and publishes the draft only if all seven match. This is why a tag or green build alone is not sufficient evidence of publication.
