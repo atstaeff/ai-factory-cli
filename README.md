@@ -36,6 +36,7 @@ go build -o factory ./cmd/factory
 | `factory doctor [path]` | Minimal presence check; not full compatibility validation |
 | `factory status [path]` | Explicitly reports that the supervisor is not implemented |
 | `factory version` | CLI version |
+| `factory pilot --repo OWNER/REPO --issue N [--execute]` | Dry-run or opt-in read-only-intended GitHub issue analysis with OpenCode |
 
 Other commands (run, onboard, update, serve, tui, logs) are **planned, not implemented**. They return a clear error rather than claiming execution.
 
@@ -75,3 +76,14 @@ Once GitHub Pages is enabled (Settings → Pages → Build and deployment → **
 The examples show illustrative processes only. They are not yet executable. See the [roadmap](docs/roadmap.md) for implementation status.
 
 Documentation dependencies are version-pinned in `package.json`, but a `package-lock.json` still needs to be generated and committed before strict, reproducible npm CI using `npm ci` is enabled.
+
+## First real WSL integration pilot
+
+This branch adds a **manual opt-in** test with your already installed `gh` and `opencode` CLIs. This is not an unattended factory or a BMAD workflow runner.
+
+```bash
+factory pilot --project ~/projects/my-existing-project --repo OWNER/REPOSITORY --issue 123
+factory pilot --project ~/projects/my-existing-project --repo OWNER/REPOSITORY --issue 123 --agent plan --execute
+```
+
+The first command has no external side effects. The second reads an existing GitHub issue and starts `opencode run --agent plan` in the supplied project; enforce read-only permissions in OpenCode and work on a clean/disposable checkout. It does not intentionally write to GitHub or start code implementation. See [WSL pilot how-to](docs/guides/wsl-pilot.md).
