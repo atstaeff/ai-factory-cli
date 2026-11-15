@@ -36,6 +36,7 @@ go build -o factory ./cmd/factory
 | `factory doctor [path]` | Minimal presence check; not full compatibility validation |
 | `factory status [path]` | Explicitly reports that the supervisor is not implemented |
 | `factory version` | CLI version |
+| `factory tools` | Read-only OS executable detection for common tooling and an optional approved issue CLI |
 
 Other commands (run, onboard, update, serve, tui, logs) are **planned, not implemented**. They return a clear error rather than claiming execution.
 
@@ -75,3 +76,16 @@ Once GitHub Pages is enabled (Settings → Pages → Build and deployment → **
 The examples show illustrative processes only. They are not yet executable. See the [roadmap](docs/roadmap.md) for implementation status.
 
 Documentation dependencies are version-pinned in `package.json`, but a `package-lock.json` still needs to be generated and committed before strict, reproducible npm CI using `npm ci` is enabled.
+
+
+## Binary prereleases
+
+The cross-platform release workflow produces Linux and Windows archives for x64 and ARM64, with SHA-256 checksums, when an approved `vX.Y.Z` tag is pushed. It validates tests before publishing a **prerelease**. Do not confuse binary availability with a functioning autonomous factory.
+
+See [installation and releases](docs/guides/releases.md) and [integration readiness](docs/concepts/tooling-review.md).
+
+```sh
+factory tools
+```
+
+`FACTORY_ISSUE_CLI` can point to a company-approved executable for a **read-only existence check**. No connection to the issue system is performed, and `factory run` does not yet exist.
