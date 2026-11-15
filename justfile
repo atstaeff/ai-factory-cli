@@ -10,7 +10,7 @@ install-docs:
 
 build-docs:
     npm run build -- --out-dir docs/site
-    test -f docs/site/index.html
+    node -e "require('fs').accessSync('docs/site/index.html')"
 
 serve-docs:
     npm run serve -- --dir docs/site --no-open
