@@ -18,6 +18,8 @@ Usage:
   factory doctor [path]      Check required project configuration
   factory processes [path]   List discovered PROCESS.md definitions
   factory status [path]      Show project setup status
+  factory pilot --repo X/Y --issue N [--project PATH] [--execute]
+                             Inspect a GitHub issue through OpenCode (opt-in)
   factory version            Print version
   factory help               Show help
 
@@ -36,6 +38,7 @@ func Execute(args []string, out, errOut io.Writer) error {
  command:=args[0]
  if command=="help" || command=="--help" || command=="-h" { _,e:=io.WriteString(out,usage); return e }
  if command=="version" { _,e:=fmt.Fprintln(out,"factory 0.1.0-dev"); return e }
+ if command=="pilot" {return runPilot(args[1:],out)}
  if command!="scan" && command!="doctor" && command!="processes" && command!="status" {
   return fmt.Errorf("unknown or not yet implemented command %q (run factory help)",command)
  }
