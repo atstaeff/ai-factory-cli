@@ -41,19 +41,61 @@ func runPilot(args []string,out io.Writer) error {
  if !githubRepoPattern.MatchString(*repo) {return errors.New("set --repo to owner/repo")}
  if *number<1 {return errors.New("set --issue to a positive issue number")}
  if *timeout<=0 || *timeout>30*time.Minute {return errors.New("timeout must be between 1ns and 30m")}
- if *agent=="" || strings.HasPrefix(*agent,"-") || strings.ContainsAny(*agent," 	
-") {return errors.New("invalid OpenCode agent identifier")}
+ if *agent=="" || strings.HasPrefix(*agent,"-") || !regexp.MustCompile(`^[A-Za-z0-9_.-]+package factory
+
+import (
+ "context"
+ "encoding/json"
+ "errors"
+ "flag"
+ "fmt"
+ "io"
+ "os"
+ "os/exec"
+ "path/filepath"
+ "regexp"
+ "strconv"
+ "strings"
+ "time"
+)
+
+var githubRepoPattern=regexp.MustCompile(`^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$`)
+
+type githubIssue struct {
+ Number int `json:"number"`
+ Title string `json:"title"`
+ Body string `json:"body"`
+ URL string `json:"url"`
+ State string `json:"state"`
+}
+
+func runPilot(args []string,out io.Writer) error {
+ fs:=flag.NewFlagSet("pilot",flag.ContinueOnError)
+ fs.SetOutput(io.Discard)
+ project:=fs.String("project",".","existing local project directory")
+ repo:=fs.String("repo","","GitHub owner/repository")
+ number:=fs.Int("issue",0,"existing issue number")
+ execute:=fs.Bool("execute",false,"actually invoke gh and opencode in the project directory")
+ agent:=fs.String("agent","plan","installed OpenCode agent name; choose a read-only agent")
+ model:=fs.String("model","","optional exact OpenCode model ID")
+ timeout:=fs.Duration("timeout",5*time.Minute,"maximum total execution time")
+ if err:=fs.Parse(args);err!=nil{return err}
+ if fs.NArg()>0 {return errors.New("unexpected positional pilot arguments")}
+ if !githubRepoPattern.MatchString(*repo) {return errors.New("set --repo to owner/repo")}
+ if *number<1 {return errors.New("set --issue to a positive issue number")}
+ if *timeout<=0 || *timeout>30*time.Minute {return errors.New("timeout must be between 1ns and 30m")}
+ if *agent=="" || strings.HasPrefix(*agent,"-") || ).MatchString(*agent) {return errors.New("invalid OpenCode agent identifier")}
  root,err:=filepath.Abs(*project)
  if err!=nil{return err}
  info,err:=os.Stat(root);if err!=nil{return err}
  if !info.IsDir(){return errors.New("project must be a directory")}
  _,processErr:=os.Stat(filepath.Join(root,".factory","PROCESS.md"))
  _,bmadErr:=os.Stat(filepath.Join(root,"_bmad"))
- fmt.Fprintf(out,"Project: %s
-GitHub: %s#%d
-BMAD directory present: %t
-Factory PROCESS.md present: %t
-",root,*repo,*number,bmadErr==nil,processErr==nil)
+ fmt.Fprintln(out,"Project:",root)
+ fmt.Fprintf(out,"GitHub: %s#%d",*repo,*number)
+ fmt.Fprintln(out)
+ fmt.Fprintln(out,"BMAD directory present:",bmadErr==nil)
+ fmt.Fprintln(out,"Factory PROCESS.md present:",processErr==nil)
  fmt.Fprintln(out,"Mode: ISSUE ANALYSIS ONLY. No issue comments, status changes, commits, PRs or merges.")
  if !*execute {
   fmt.Fprintln(out,"DRY RUN: no external programs called. Repeat with --execute to read the issue and invoke OpenCode.")
@@ -96,11 +138,11 @@ Body:
  cmd.Dir=root
  cmd.Stdout=out
  cmd.Stderr=os.Stderr
- fmt.Fprintf(out,"Issue fetched: #%d %s
-Starting OpenCode agent %q. WARNING: permissions must be enforced by your OpenCode configuration.
-",issue.Number,issue.Title,*agent)
+ fmt.Fprintf(out,"Issue fetched: #%d %s",issue.Number,issue.Title)
+ fmt.Fprintln(out)
+ fmt.Fprintln(out,"Starting OpenCode agent:",*agent)
+ fmt.Fprintln(out,"WARNING: permissions must be enforced by your OpenCode configuration.")
  if err:=cmd.Run();err!=nil{return fmt.Errorf("opencode run failed: %w",err)}
- fmt.Fprintln(out,"
-Pilot completed. Review git status to confirm the workspace is unchanged.")
+ fmt.Fprintln(out,"Pilot completed. Review git status to confirm the workspace is unchanged.")
  return nil
 }
