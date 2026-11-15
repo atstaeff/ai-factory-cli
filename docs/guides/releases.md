@@ -16,6 +16,29 @@ A release workflow packages a standalone **`factory`** CLI, never an `ai-factory
 
 The workflow also generates `SHA256SUMS`. No Go runtime is required on the target machine. BMAD and OpenCode are **not bundled** and require separately approved installation.
 
+## No-Go installation via GitHub Releases
+
+Once the first GitHub prerelease has **actually been published**, download only the archive for your OS/CPU from [Releases](https://github.com/atstaeff/ai-factory-cli/releases). On WSL/Linux and Windows, the included installation scripts verify checksums and install only the native `factory` executable to your user directory:
+
+~~~bash
+# WSL / Linux (after reviewing the script from the repository)
+curl -fsSLO https://raw.githubusercontent.com/atstaeff/ai-factory-cli/main/scripts/install.sh
+bash install.sh v0.1.0-rc.1
+export PATH="$HOME/.local/bin:$PATH"
+factory processes examples
+factory scan examples/software-engineering
+~~~
+
+~~~powershell
+# Windows PowerShell (after reviewing the script from the repository)
+Invoke-WebRequest https://raw.githubusercontent.com/atstaeff/ai-factory-cli/main/scripts/install.ps1 -OutFile install.ps1
+.\install.ps1 -Version v0.1.0-rc.1
+factory version
+factory scan .
+~~~
+
+**Important:** These commands work only after release `v0.1.0-rc.1` exists. They do not install OpenCode or BMAD. On managed devices, use approved download channels and review the scripts before execution. To run the `examples` commands, run them inside a checkout of this repository or supply another existing project path. No Go toolchain is needed for either native binary.
+
 ## Download
 
 When the first tagged release is actually published, visit the [Releases page](https://github.com/atstaeff/ai-factory-cli/releases). Select the archive matching your CPU and OS, verify its checksum, and extract it.
