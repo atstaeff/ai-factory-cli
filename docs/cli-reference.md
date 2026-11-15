@@ -11,7 +11,11 @@ The installed binary is called **`factory`**, even though the GitHub repository 
 | Command | Current behavior |
 | --- | --- |
 | `factory`, `factory help` | Print help text |
-| `factory version` | Print the development version |
+| `factory version` | Print the build version |
+| `factory tools` | Read-only CLI executable discovery |
+| `factory pilot --repo X/Y --issue N` | Prepare a read-only issue-analysis pilot (dry run) |
+| `factory pilot ... --execute` | Call approved local `gh` and `opencode` for issue analysis; review local permissions first |
+| `factory demo --scenario running` | Live-refreshing terminal dashboard with **synthetic** telemetry |
 | `factory scan [path]` | Read-only inspection of known local paths |
 | `factory processes [path]` | Find named `PROCESS.md` files, including under `.factory/` |
 | `factory doctor [path]` | Minimal presence check for `.factory/PROCESS.md` |
@@ -31,3 +35,5 @@ The installed binary is called **`factory`**, even though the GitHub repository 
 go test ./...
 go vet ./...
 ~~~
+
+See [Binary installation](./guides/releases.md), [WSL pilot](./guides/wsl-pilot.md), and [Terminal demo](./guides/terminal-demo.md).
