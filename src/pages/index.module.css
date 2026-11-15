@@ -14,7 +14,28 @@
 .dot { display: inline-block; background: #b4afb6; width: 8px; height: 8px; margin-right: 7px; border-radius: 50%; }
 .dot:nth-child(2) { background: #eaeaea; }
 .dot:nth-child(3) { background: #fff; margin-right: 16px; }
-.terminal pre { color: #f8fafc; font-size: .9rem; margin: 0; padding: 1.3rem 1.6rem; overflow-x: auto; }
+.terminal {
+  /* Keep Docusaurus/Infima defaults from turning the preview white-on-white. */
+  --ifm-pre-background: #111827;
+  --ifm-pre-color: #f8fafc;
+  --ifm-code-background: transparent;
+}
+.terminal pre,
+.terminal pre code {
+  background: #111827 !important;
+  color: #f8fafc !important;
+  text-shadow: none !important;
+}
+.terminal pre {
+  font-size: .9rem;
+  line-height: 1.65;
+  margin: 0;
+  padding: 1.3rem 1.6rem;
+  overflow-x: auto;
+  white-space: pre;
+  border: 0;
+}
+.terminal pre code { font: inherit; }
 .section { padding: 4rem 0 5rem; }
 .section h2 { font-size: 2.3rem; letter-spacing: -.025em; }
 .sectionLead { color: #717171; max-width: 700px; }
