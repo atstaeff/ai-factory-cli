@@ -10,6 +10,8 @@ import (
  "strings"
 )
 
+var Version = "0.1.0-dev"
+
 const usage = `factory - process-driven AI work orchestration (early prototype)
 
 Usage:
@@ -18,6 +20,9 @@ Usage:
   factory doctor [path]      Check required project configuration
   factory processes [path]   List discovered PROCESS.md definitions
   factory status [path]      Show project setup status
+  factory tools              Check installed CLI executables
+  factory pilot --repo X/Y --issue N [--execute]  Test GitHub + OpenCode
+  factory demo [--scenario NAME]  Refreshing synthetic terminal display
   factory version            Print version
   factory help               Show help
 
@@ -35,7 +40,10 @@ func Execute(args []string, out, errOut io.Writer) error {
  if len(args)==0 { _,e:=io.WriteString(out,usage); return e }
  command:=args[0]
  if command=="help" || command=="--help" || command=="-h" { _,e:=io.WriteString(out,usage); return e }
- if command=="version" { _,e:=fmt.Fprintln(out,"factory 0.1.0-dev"); return e }
+ if command=="version" { _,e:=fmt.Fprintln(out,"factory "+Version); return e }
+ if command=="tools" { if len(args)!=1 {return errors.New("tools takes no arguments")}; return checkTools(out) }
+ if command=="demo" {return runDemo(args[1:],out)}
+ if command=="pilot" {return runPilot(args[1:],out)}
  if command!="scan" && command!="doctor" && command!="processes" && command!="status" {
   return fmt.Errorf("unknown or not yet implemented command %q (run factory help)",command)
  }

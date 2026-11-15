@@ -1,0 +1,103 @@
+name: Release CLI binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-build:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Resolve version
+        id: meta
+        shell: bash
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME}"
+          if [[ ! "${VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semver tag: ${VERSION}" >&2
+            exit 1
+          fi
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+      - name: Ensure release commit is on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main || { echo 'Release tag is not based on main' >&2; exit 1; }
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: false
+      - name: Validate Go project
+        run: |
+          go test ./...
+          go vet ./...
+      - name: Cross-compile and package
+        shell: bash
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          for target in linux/amd64 linux/arm64 windows/amd64 windows/arm64; do
+            GOOS="${target%/*}"
+            GOARCH="${target#*/}"
+            name="factory_${VERSION}_${GOOS}_${GOARCH}"
+            mkdir -p "staging/${name}"
+            executable="factory"
+            if [[ "${GOOS}" == windows ]]; then executable="factory.exe"; fi
+            CGO_ENABLED=0 GOOS="${GOOS}" GOARCH="${GOARCH}" go build -trimpath -buildvcs=false -ldflags "-s -w -X github.com/atstaeff/ai-factory-cli/internal/factory.Version=${VERSION}" -o "staging/${name}/${executable}" ./cmd/factory
+            if [[ "${GOOS}" == windows ]]; then
+              (cd "staging/${name}" && zip -q "../../dist/${name}.zip" "${executable}")
+            else
+              tar -czf "dist/${name}.tar.gz" -C "staging/${name}" "${executable}"
+            fi
+          done
+          (cd dist && sha256sum factory_* > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-assets
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: verify-and-build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-assets
+          path: dist
+      - name: Publish GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          VERSION: ${{ needs.verify-and-build.outputs.version }}
+        run: |
+          set -euo pipefail
+          # Publish only from reviewed, existing Git tags. Never overwrite releases.
+          if gh release view "${VERSION}" >/dev/null 2>&1; then
+            echo "Release ${VERSION} already exists; refusing to overwrite" >&2
+            exit 1
+          fi
+          gh release create "${VERSION}" dist/* --prerelease --generate-notes --title "Factory ${VERSION}" --verify-tag
