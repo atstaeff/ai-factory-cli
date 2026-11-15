@@ -46,3 +46,9 @@ The source repository is private. GitHub Pages availability and visibility depen
 ## Static output location
 
 `just build-docs` builds Docusaurus into `docs/site/` while keeping Markdown under `docs/`. The generated directory is Git-ignored; GitHub Actions uploads it to Pages. Do **not** set GitHub Pages to deploy from the `main` branch's `/docs` folder: that contains Markdown sources, not the built website. Use GitHub Actions as the Pages source.
+
+## Site deployment and 404 troubleshooting
+
+The `just build-docs` recipe produces `docs/site/index.html`; the `Publish Docs to GitHub Pages` workflow uploads that folder as its root artifact. It attempts to enable GitHub Pages and switch its `build_type` to `workflow`, then checks the public URL for an HTTP success and AI Factory content. If GitHub rejects automatic activation, verify **Settings → Pages → Build and deployment → Source: GitHub Actions** and inspect the failing Actions job. A green Docs CI does **not** mean Pages is deployed.
+
+The canonical URL is `https://atstaeff.github.io/ai-factory-cli/` (Docusaurus `baseUrl: '/ai-factory-cli/'`). Never point the Pages branch source at the Markdown-only `docs/` folder.
