@@ -56,7 +56,10 @@ jobs:
           echo "Pages build type: ${build_type}"
           if [[ "${build_type}" != "workflow" ]]; then
             echo "Switching Pages source to GitHub Actions"
-            gh api --method PUT "repos/${GH_REPO}/pages" -f build_type=workflow
+            if ! gh api --method PUT "repos/${GH_REPO}/pages" -f build_type=workflow; then
+              echo "::error::GitHub Pages is configured to deploy from a branch. The Actions token cannot change this setting (HTTP 403). Repository admin: open https://github.com/${GH_REPO}/settings/pages and set Build and deployment > Source > GitHub Actions. Then rerun this workflow."
+              exit 1
+            fi
           fi
       - name: Validate generated Pages entry file
         shell: bash
