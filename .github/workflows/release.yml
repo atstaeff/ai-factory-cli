@@ -4,15 +4,9 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_dispatch:
-    inputs:
-      version:
-        description: 'Prerelease version (for example v0.1.0-rc.1)'
-        type: string
-        required: true
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
@@ -34,16 +28,18 @@ jobs:
           INPUT_VERSION: ${{ inputs.version }}
         run: |
           set -euo pipefail
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            VERSION="${INPUT_VERSION}"
-          else
-            VERSION="${GITHUB_REF_NAME}"
-          fi
+          VERSION="${GITHUB_REF_NAME}"
           if [[ ! "${VERSION}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
             echo "Invalid semver tag: ${VERSION}" >&2
             exit 1
           fi
           echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+      - name: Ensure release commit is on main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git merge-base --is-ancestor HEAD origin/main || { echo 'Release tag is not based on main' >&2; exit 1; }
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -84,6 +80,8 @@ jobs:
   publish:
     needs: verify-and-build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -97,7 +95,7 @@ jobs:
           VERSION: ${{ needs.verify-and-build.outputs.version }}
         run: |
           set -euo pipefail
-          # Dispatch is intended for opt-in pre-releases only. Tags must not already exist.
+          # Publish only from reviewed, existing Git tags. Never overwrite releases.
           if gh release view "${VERSION}" >/dev/null 2>&1; then
             echo "Release ${VERSION} already exists; refusing to overwrite" >&2
             exit 1
