@@ -104,3 +104,10 @@ Start with [the WSL pilot](docs/guides/wsl-pilot.md) on a clean repository and a
 ## Documentation brand alignment
 
 The Docusaurus UI follows the design tokens in `stefanposs/sp-website-blog` (`data/theme.json`): primary navy `#122E53`, white and light-grey surfaces, Heebo body text, and Signika headings. The style source is intentionally kept separate from website code; the documentation remains a standalone static Docusaurus build. After merging a theme change, GitHub Actions must successfully rebuild and deploy `docs/site/` for it to appear on GitHub Pages.
+
+## Release and website publishing health
+
+- Docs build: `just build-docs` writes `docs/site/index.html`.
+- Docs deployment: [Publish Docs to GitHub Pages](https://github.com/atstaeff/ai-factory-cli/actions/workflows/pages.yml) now enables/configures Pages and verifies the live URL after deployment.
+- Native distributions: [Release CLI binaries](https://github.com/atstaeff/ai-factory-cli/actions/workflows/release.yml) now validates the complete asset list before publishing a prerelease.
+- **Neither a merged PR nor a Git tag alone proves publishing.** Inspect each publish workflow's final status.
