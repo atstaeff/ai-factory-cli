@@ -36,6 +36,7 @@ go build -o factory ./cmd/factory
 | `factory doctor [path]` | Minimal presence check; not full compatibility validation |
 | `factory status [path]` | Explicitly reports that the supervisor is not implemented |
 | `factory version` | CLI version |
+| `factory demo --scenario running` | Real ANSI refresh display with **simulated** job data |
 
 Other commands (run, onboard, update, serve, tui, logs) are **planned, not implemented**. They return a clear error rather than claiming execution.
 
@@ -75,3 +76,16 @@ Once GitHub Pages is enabled (Settings → Pages → Build and deployment → **
 The examples show illustrative processes only. They are not yet executable. See the [roadmap](docs/roadmap.md) for implementation status.
 
 Documentation dependencies are version-pinned in `package.json`, but a `package-lock.json` still needs to be generated and committed before strict, reproducible npm CI using `npm ci` is enabled.
+
+## Terminal observability demo
+
+A live-refreshing terminal display is available with **synthetic telemetry only**:
+
+```bash
+factory demo --scenario running
+factory demo --scenario approvals
+factory demo --scenario incidents
+factory demo --scenario multi
+```
+
+Stop with Ctrl+C. The demo does not invoke actual models, BMAD, OpenCode or issue providers. It is *not* the promised real supervisor or `factory tui` implementation. [Documentation](docs/guides/terminal-demo.md).
