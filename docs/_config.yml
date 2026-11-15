@@ -4,10 +4,10 @@ url: "https://atstaeff.github.io"
 baseurl: "/ai-factory-cli"
 markdown: kramdown
 highlighter: rouge
-permalink: pretty
 exclude:
   - site
   - node_modules
+  - README.md
 defaults:
   - scope:
       path: ""
