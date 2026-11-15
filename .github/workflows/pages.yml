@@ -41,9 +41,49 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build documentation
         run: just build-docs
-      - uses: actions/configure-pages@v5
+      - name: Configure or enable GitHub Pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+      - name: Ensure Pages publishes GitHub Actions artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          build_type="$(gh api "repos/${GH_REPO}/pages" --jq '.build_type // "unknown"')"
+          echo "Pages build type: ${build_type}"
+          if [[ "${build_type}" != "workflow" ]]; then
+            echo "Switching Pages source to GitHub Actions"
+            gh api --method PUT "repos/${GH_REPO}/pages" -f build_type=workflow
+          fi
+      - name: Validate generated Pages entry file
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s docs/site/index.html
+          grep -q 'AI Factory' docs/site/index.html
       - uses: actions/upload-pages-artifact@v3
         with:
           path: docs/site
       - id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verify public website is reachable (not GitHub Pages 404)
+        shell: bash
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          echo "Checking published URL: ${SITE_URL}"
+          # GitHub Pages content propagation may lag behind successful deployment.
+          for attempt in {1..18}; do
+            if curl --fail --location --silent --show-error --max-time 15 "${SITE_URL}" -o /tmp/factory-site.html && grep -q 'AI Factory' /tmp/factory-site.html; then
+              echo "Live Pages entry point verified: ${SITE_URL}"
+              exit 0
+            fi
+            echo "Pages not yet serving AI Factory (attempt ${attempt}/18)"
+            sleep 10
+          done
+          echo "::error::Pages deployment completed but website still returns 404 or missing content. Check Settings > Pages (Source: GitHub Actions) and the GitHub Pages environment."
+          exit 1
