@@ -3,9 +3,9 @@ id: releases
 title: Installing Factory binaries
 ---
 
-# Windows and Linux binaries
+# macOS, Windows and Linux binaries
 
-A release workflow packages a standalone **`factory`** CLI, never an `ai-factory-cli` binary. It builds four target combinations with CGO disabled:
+A release workflow packages a standalone **`factory`** CLI, never an `ai-factory-cli` binary. It builds six target combinations with CGO disabled:
 
 | Platform | Archive | Binary |
 | --- | --- | --- |
@@ -13,15 +13,17 @@ A release workflow packages a standalone **`factory`** CLI, never an `ai-factory
 | Linux ARM64 | `factory_vX.Y.Z_linux_arm64.tar.gz` | `factory` |
 | Windows x64 | `factory_vX.Y.Z_windows_amd64.zip` | `factory.exe` |
 | Windows ARM64 | `factory_vX.Y.Z_windows_arm64.zip` | `factory.exe` |
+| macOS Intel | `factory_vX.Y.Z_darwin_amd64.tar.gz` | `factory` |
+| macOS Apple Silicon | `factory_vX.Y.Z_darwin_arm64.tar.gz` | `factory` |
 
 The workflow also generates `SHA256SUMS`. No Go runtime is required on the target machine. BMAD and OpenCode are **not bundled** and require separately approved installation.
 
 ## No-Go installation via GitHub Releases
 
-Once the first GitHub prerelease has **actually been published**, download only the archive for your OS/CPU from [Releases](https://github.com/atstaeff/ai-factory-cli/releases). On WSL/Linux and Windows, the included installation scripts verify checksums and install only the native `factory` executable to your user directory:
+Once the first GitHub prerelease has **actually been published**, download only the archive for your OS/CPU from [Releases](https://github.com/atstaeff/ai-factory-cli/releases). On macOS, WSL/Linux and Windows, the included installation scripts verify checksums and install only the native `factory` executable to your user directory:
 
 ~~~bash
-# WSL / Linux (after reviewing the script from the repository)
+# macOS / WSL / Linux (after reviewing the script from the repository)
 curl -fsSLO https://raw.githubusercontent.com/atstaeff/ai-factory-cli/main/scripts/install.sh
 bash install.sh v0.1.0-rc.1
 export PATH="$HOME/.local/bin:$PATH"
@@ -37,7 +39,7 @@ factory version
 factory scan .
 ~~~
 
-**Important:** These commands work only after release `v0.1.0-rc.1` exists. They do not install OpenCode or BMAD. On managed devices, use approved download channels and review the scripts before execution. To run the `examples` commands, run them inside a checkout of this repository or supply another existing project path. No Go toolchain is needed for either native binary.
+**Important:** These commands work only after release `v0.1.0-rc.1` exists. They do not install OpenCode or BMAD. On managed devices, use approved download channels and review the scripts before execution. macOS builds are currently cross-compiled on Linux CI; test on the actual target machines before enterprise use. Unsigned/unnotarized macOS binaries may be blocked by Gatekeeper. To run the `examples` commands, run them inside a checkout of this repository or supply another existing project path. No Go toolchain is needed for either native binary.
 
 ## Download
 
@@ -75,7 +77,7 @@ git tag -a v0.1.0-rc.1 -m "Factory v0.1.0-rc.1"
 git push origin v0.1.0-rc.1
 ~~~
 
-The tag triggers the workflow, which runs tests, builds binaries, and publishes a **prerelease** after successful verification. It refuses to overwrite an existing release and checks that the tag already exists.
+The tag triggers the workflow, which runs tests, builds six native binaries, and publishes a **prerelease** after successful verification. It refuses to overwrite an existing release and checks that the tag already exists.
 
 :::caution Pre-release scope
 v0.1.0-rc.1 is only a proposed example version. The current CLI supports discovery and diagnostics. It cannot autonomously execute BMAD, OpenCode, GitHub or Jira processes.
