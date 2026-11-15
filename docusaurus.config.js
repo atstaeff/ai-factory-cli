@@ -1,4 +1,4 @@
-// Docusaurus sources live in docs/. GitHub Pages serves the generated build/ artifact.
+// Markdown sources live in docs/. The just build-docs recipe outputs generated HTML to docs/site/.
 const config = {
   title: 'AI Factory',
   tagline: 'Process-driven AI work orchestration',

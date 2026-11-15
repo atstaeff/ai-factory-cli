@@ -22,7 +22,7 @@ Docs live under `docs/`, powered by Docusaurus configured in the repo root.
 ~~~bash
 npm install
 npm run start
-npm run build
+just build-docs
 ~~~
 
 The homepage is `src/pages/index.js`. Navigation uses `sidebars.js`. The shared theme is `src/css/custom.css`.
@@ -34,10 +34,15 @@ The PR workflow checks that the docs build; only pushes to `main` attempt deploy
 1. Repository **Settings → Pages**.
 2. Under **Build and deployment**, select **GitHub Actions** as the source.
 3. Ensure Actions are enabled and allow Pages deployment.
-4. Merge a reviewed PR into `main`; the deploy workflow publishes the generated `build/` directory.
+4. Merge a reviewed PR into `main`; the deploy workflow publishes the generated `docs/site/` directory.
 
 Docusaurus source files under `docs/` are **not themselves a deployable GitHub Pages website**. GitHub Pages serves the compiled static output. The intended public URL is `https://atstaeff.github.io/ai-factory-cli/` **only after a successful deployment**.
 
 :::caution Private repository
 The source repository is private. GitHub Pages availability and visibility depend on plan, settings and organizational policies. Do not deploy sensitive documentation; configure Pages visibility before publishing.
 :::
+
+
+## Static output location
+
+`just build-docs` builds Docusaurus into `docs/site/` while keeping Markdown under `docs/`. The generated directory is Git-ignored; GitHub Actions uploads it to Pages. Do **not** set GitHub Pages to deploy from the `main` branch's `/docs` folder: that contains Markdown sources, not the built website. Use GitHub Actions as the Pages source.

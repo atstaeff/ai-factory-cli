@@ -8,3 +8,4 @@
 /.docusaurus/
 /.cache/
 npm-debug.log*
+/docs/site/

@@ -63,15 +63,28 @@ Docusaurus source content lives under [`docs/`](docs/), with a designed landing 
 ```bash
 npm install
 npm run start
-npm run build
+just build-docs
 ```
 
 Development URL: `http://localhost:3000/ai-factory-cli/`.
 
-Once GitHub Pages is enabled (Settings → Pages → Build and deployment → **GitHub Actions**) and a docs change is merged to `main`, the Pages workflow attempts to publish the compiled `build/` directory to `https://atstaeff.github.io/ai-factory-cli/`. The Pages URL is **not verified live** yet; the repository is private and availability/visibility depend on plan and settings.
+Once GitHub Pages is enabled (Settings → Pages → Build and deployment → **GitHub Actions**) and a docs change is merged to `main`, the Pages workflow attempts to publish the compiled `build/` directory to `https://atstaeff.github.io/ai-factory-cli/`. The Pages URL is **not verified live** yet; the repository is public; publishing requires a successful Pages Actions workflow.
 
-**Important:** GitHub Pages does not directly serve the Docusaurus Markdown in `docs/`; Docusaurus first creates a static `build/` artifact. The documentation is public-facing: do not include internal customer details, credentials or proprietary CLI snippets.
+**Important:** GitHub Pages does not directly serve the Docusaurus Markdown in `docs/`; Docusaurus first generates `docs/site/` via `just build-docs`; GitHub Actions uploads that artifact. The documentation is public-facing: do not include internal customer details, credentials or proprietary CLI snippets.
 
 The examples show illustrative processes only. They are not yet executable. See the [roadmap](docs/roadmap.md) for implementation status.
 
 Documentation dependencies are version-pinned in `package.json`, but a `package-lock.json` still needs to be generated and committed before strict, reproducible npm CI using `npm ci` is enabled.
+
+
+### Reproducible documentation build
+
+Install the `just` command runner, then:
+
+```bash
+npm install
+just build-docs
+just serve-docs
+```
+
+The Markdown sources remain in `docs/`; generated static HTML is placed in `docs/site/` and deliberately Git-ignored. The PR Docs CI and GitHub Pages workflow both call **`just build-docs`**. GitHub Pages is configured to use **GitHub Actions** (rather than selecting `/docs` as a branch folder); its artifact is `docs/site/`.
