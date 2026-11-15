@@ -40,7 +40,7 @@ func runPilot(args []string,out io.Writer) error {
  if !githubRepoPattern.MatchString(*repo) {return errors.New("set --repo to owner/repo")}
  if *number<1 {return errors.New("set --issue to a positive issue number")}
  if *timeout<=0 || *timeout>30*time.Minute {return errors.New("timeout must be between 1ns and 30m")}
- ).MatchString(*agent) {return errors.New("invalid OpenCode agent identifier")}
+ if len(*agent)==0 || (*agent)[0]==45 || !regexp.MustCompile("^[A-Za-z0-9_.-]+$").MatchString(*agent) {return errors.New("invalid OpenCode agent identifier")}
  root,err:=filepath.Abs(*project)
  if err!=nil{return err}
  info,err:=os.Stat(root);if err!=nil{return err}
