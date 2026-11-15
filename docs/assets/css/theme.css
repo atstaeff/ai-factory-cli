@@ -1,0 +1,49 @@
+/* Branch-based GitHub Pages theme. Brand tokens sourced from stefanposs.com. */
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;600&family=Signika:wght@500;700&display=swap');
+:root { --navy:#122e53; --text:#122e53; --muted:#717171; --line:#eaeaea; --surface:#f6f6f6; --bg:#fff; --code:#111827; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font-family:Heebo,system-ui,-apple-system,sans-serif; font-size:16px; line-height:1.7; }
+h1,h2,h3,h4 { font-family:Signika,Heebo,sans-serif; line-height:1.2; }
+h1 { font-size:clamp(2rem,4vw,3.3rem); margin:.4rem 0 1.5rem; }
+h2 { font-size:1.7rem; margin-top:2.3rem; }
+a { color:#122e53; }
+a:hover { text-decoration:underline; }
+.shell { max-width:1260px; width:calc(100% - 3rem); margin:0 auto; }
+.topbar { border-bottom:1px solid var(--line); background:#fff; }
+.top-inner { display:flex; justify-content:space-between; align-items:center; gap:1.5rem; min-height:76px; }
+.brand { display:flex; align-items:center; gap:.75rem; color:var(--navy); text-decoration:none; font:700 1.35rem Signika,sans-serif; white-space:nowrap; }
+.brand-symbol { display:inline-grid; place-items:center; color:#fff; background:var(--navy); width:36px; height:36px; border-radius:9px; }
+.main-nav { display:flex; flex-wrap:wrap; gap:1rem; align-items:center; }
+.main-nav a { font-weight:600; text-decoration:none; font-size:.94rem; }
+.body-grid { display:grid; grid-template-columns:232px minmax(0,1fr); gap:3rem; min-height:72vh; }
+.sidebar { border-right:1px solid var(--line); padding:2rem 1.6rem 2rem 0; display:flex; flex-direction:column; gap:.36rem; }
+.sidebar a { font-size:.91rem; text-decoration:none; padding:.26rem .4rem; border-radius:5px; }
+.sidebar a:hover { background:var(--surface); }
+.sidebar-title { font-family:Signika,sans-serif; font-weight:700; font-size:.95rem; margin:1rem 0 .2rem; }
+.sidebar-title:first-child { margin-top:0; }
+.content { min-width:0; max-width:850px; padding:3.4rem 0 5rem; }
+.content p,.content li { max-width:80ch; }
+.content img { max-width:100%; height:auto; }
+.content table { display:block; width:max-content; max-width:100%; overflow-x:auto; border-collapse:collapse; margin:1.5rem 0; }
+th,td { padding:.55rem .8rem; border:1px solid var(--line); text-align:left; }
+th { background:var(--surface); }
+pre,.highlight pre { background:var(--code) !important; color:#f8fafc !important; padding:1.2rem 1.4rem; border-radius:11px; overflow-x:auto; font-size:.88rem; line-height:1.6; }
+pre code,.highlight code { color:inherit !important; background:transparent !important; }
+:not(pre)>code { background:var(--surface); border-radius:4px; padding:.1rem .3rem; color:#122e53; }
+blockquote { margin:1.5rem 0; padding:1rem 1.4rem; background:var(--surface); border-left:4px solid var(--navy); }
+.hero-eyebrow { font-size:.8rem; font-weight:700; color:var(--muted); letter-spacing:.14em; text-transform:uppercase; }
+.hero-lead { font-size:1.25rem; color:var(--muted); max-width:720px; }
+.actions { display:flex; flex-wrap:wrap; gap:.8rem; margin:2rem 0; }
+.action { border:1px solid var(--navy); background:var(--navy); color:#fff; text-decoration:none; padding:.65rem 1.2rem; border-radius:6px; font-weight:600; }
+.action.secondary { background:#fff; color:var(--navy); }
+.action:hover { text-decoration:none; opacity:.87; }
+.cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem; margin-top:2rem; }
+.card { padding:1.5rem; border:1px solid var(--line); border-radius:9px; background:#fff; text-decoration:none; }
+.card h3 { margin:0 0 .4rem; }
+.card p { color:var(--muted); margin:0; }
+.footer { background:var(--navy); color:#fff; padding:1.8rem 0; }
+.footer a { color:#fff; }
+.skip { position:absolute; left:-10000px; top:auto; }
+.skip:focus { left:1rem; top:1rem; background:#fff; padding:.5rem; }
+@media(max-width:800px) { .shell { width:calc(100% - 2rem); } .body-grid { display:block; } .sidebar { border-right:0; border-bottom:1px solid var(--line); padding:1.4rem 0; display:grid; grid-template-columns:repeat(2,1fr); gap:.25rem; } .sidebar-title { grid-column:1/-1; } .top-inner { align-items:flex-start; flex-direction:column; padding:1rem 0; } .content { padding:2rem 0 4rem; } .cards { grid-template-columns:1fr; } }
