@@ -57,3 +57,10 @@ The canonical URL is `https://atstaeff.github.io/ai-factory-cli/` (Docusaurus `b
 ### One-time required GitHub Pages setting
 
 On this repository GitHub reported `build_type: legacy`, and the workflow's token received HTTP 403 when trying to switch it to `workflow`. This permission cannot be overcome by changing build scripts. A repository administrator must visit [Settings → Pages](https://github.com/atstaeff/ai-factory-cli/settings/pages), choose **GitHub Actions** under **Build and deployment → Source**, and rerun [Publish Docs to GitHub Pages](https://github.com/atstaeff/ai-factory-cli/actions/workflows/pages.yml) on `main`. The workflow then uploads and verifies the generated site.
+
+
+## Branch-based GitHub Pages setup (current)
+
+In **Repository Settings → Pages → Build and deployment**, set **Source: Deploy from a branch**, **Branch: main**, **Folder: /docs**, then Save. The public site is built by GitHub Pages/Jekyll from `docs/index.md` and `docs/_layouts/default.html` (the entry point becomes `index.html`). No separate Pages Action is needed; this intentionally replaces the former Actions artifact deployment. All source Markdown continues to live in `docs/`.
+
+The earlier GitHub Pages publishing instructions above that refer to the Actions source are *superseded* by this section. `just build-docs` still performs a separate Docusaurus compatibility build; it is not what branch-based GitHub Pages publishes. Public site: https://atstaeff.github.io/ai-factory-cli/.
