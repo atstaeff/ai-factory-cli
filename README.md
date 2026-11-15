@@ -78,6 +78,19 @@ The examples show illustrative processes only. They are not yet executable. See 
 Documentation dependencies are version-pinned in `package.json`, but a `package-lock.json` still needs to be generated and committed before strict, reproducible npm CI using `npm ci` is enabled.
 
 
+## Install without Go (Windows, Linux, WSL)
+
+The **GitHub Release archives** are native executables. Users should not need `go run`, `go build` or Go installed. After the tagged release has been published, see [release installation](docs/guides/releases.md) for Linux/WSL Bash and Windows PowerShell installers with SHA-256 verification.
+
+The commands then work directly from any project:
+
+```bash
+factory processes .
+factory scan .
+```
+
+The files in `examples/` are only available when you have cloned or downloaded the repository; the binary does not bundle them.
+
 ## Binary prereleases
 
 The cross-platform release workflow produces Linux and Windows archives for x64 and ARM64, with SHA-256 checksums, when an approved `vX.Y.Z` tag is pushed. It validates tests before publishing a **prerelease**. Do not confuse binary availability with a functioning autonomous factory.
