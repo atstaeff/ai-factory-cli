@@ -16,6 +16,7 @@ The installed binary is called **`factory`**, even though the GitHub repository 
 | `factory processes [path]` | Find named `PROCESS.md` files, including under `.factory/` |
 | `factory doctor [path]` | Minimal presence check for `.factory/PROCESS.md` |
 | `factory status [path]` | Explicitly reports that the supervisor is not implemented |
+| `factory tools` | Inspect whether optional CLI executables are discoverable on PATH without invoking them |
 
 ### Planned, not implemented
 
@@ -31,3 +32,5 @@ The installed binary is called **`factory`**, even though the GitHub repository 
 go test ./...
 go vet ./...
 ~~~
+
+See [Releases and installation](./guides/releases.md) and [Tooling readiness](./concepts/tooling-review.md).
