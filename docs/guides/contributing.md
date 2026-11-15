@@ -52,3 +52,8 @@ The source repository is private. GitHub Pages availability and visibility depen
 The `just build-docs` recipe produces `docs/site/index.html`; the `Publish Docs to GitHub Pages` workflow uploads that folder as its root artifact. It attempts to enable GitHub Pages and switch its `build_type` to `workflow`, then checks the public URL for an HTTP success and AI Factory content. If GitHub rejects automatic activation, verify **Settings → Pages → Build and deployment → Source: GitHub Actions** and inspect the failing Actions job. A green Docs CI does **not** mean Pages is deployed.
 
 The canonical URL is `https://atstaeff.github.io/ai-factory-cli/` (Docusaurus `baseUrl: '/ai-factory-cli/'`). Never point the Pages branch source at the Markdown-only `docs/` folder.
+
+
+### One-time required GitHub Pages setting
+
+On this repository GitHub reported `build_type: legacy`, and the workflow's token received HTTP 403 when trying to switch it to `workflow`. This permission cannot be overcome by changing build scripts. A repository administrator must visit [Settings → Pages](https://github.com/atstaeff/ai-factory-cli/settings/pages), choose **GitHub Actions** under **Build and deployment → Source**, and rerun [Publish Docs to GitHub Pages](https://github.com/atstaeff/ai-factory-cli/actions/workflows/pages.yml) on `main`. The workflow then uploads and verifies the generated site.
