@@ -71,9 +71,7 @@ just build-docs
 
 Development URL: `http://localhost:3000/ai-factory-cli/`.
 
-Once GitHub Pages is enabled (Settings → Pages → Build and deployment → **GitHub Actions**) and a docs change is merged to `main`, the Pages workflow attempts to publish the compiled `build/` directory to `https://atstaeff.github.io/ai-factory-cli/`. The Pages URL is **not verified live** yet; the repository is public; publishing requires a successful Pages Actions workflow.
-
-**Important:** GitHub Pages does not directly serve the Docusaurus Markdown in `docs/`; Docusaurus first generates `docs/site/` via `just build-docs`; GitHub Actions uploads that artifact. The documentation is public-facing: do not include internal customer details, credentials or proprietary CLI snippets.
+GitHub Pages uses **Deploy from a branch → main → /docs** (not GitHub Actions). The publishable site is directly in `docs/`, with `docs/index.md` and `docs/_layouts/default.html` rendered by GitHub Pages/Jekyll. All Markdown docs remain in `docs/`. Site URL: https://atstaeff.github.io/ai-factory-cli/. The owner must select this Pages publishing source in Settings → Pages. `just build-docs` remains an optional Docusaurus validation build and is **not** the GitHub Pages deployment source.
 
 The examples show illustrative processes only. They are not yet executable. See the [roadmap](docs/roadmap.md) for implementation status.
 
@@ -111,3 +109,15 @@ The Docusaurus UI follows the design tokens in `stefanposs/sp-website-blog` (`da
 - Docs deployment: [Publish Docs to GitHub Pages](https://github.com/atstaeff/ai-factory-cli/actions/workflows/pages.yml) now enables/configures Pages and verifies the live URL after deployment.
 - Native distributions: [Release CLI binaries](https://github.com/atstaeff/ai-factory-cli/actions/workflows/release.yml) now validates the complete asset list before publishing a prerelease.
 - **Neither a merged PR nor a Git tag alone proves publishing.** Inspect each publish workflow's final status.
+
+
+### Branch-based documentation publishing
+
+- **Pages Source:** Deploy from a branch
+- **Branch:** `main`
+- **Folder:** `/docs`
+- **Website root:** `docs/index.md` (Jekyll renders it as `index.html`)
+- **Brand:** stefanposs.com navy, Heebo/Signika; shared template `docs/_layouts/default.html`
+- **Docs content:** Markdown in `docs/`, automatically rendered by GitHub Pages/Jekyll on pushes to `main`
+
+Do not select GitHub Actions as Pages source. The previous Actions-based Pages deploy workflow was intentionally removed to avoid conflicting publishing methods.
