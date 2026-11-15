@@ -36,6 +36,9 @@ go build -o factory ./cmd/factory
 | `factory doctor [path]` | Minimal presence check; not full compatibility validation |
 | `factory status [path]` | Explicitly reports that the supervisor is not implemented |
 | `factory version` | CLI version |
+| `factory tools` | Read-only executable availability |
+| `factory pilot --repo X/Y --issue N [--execute]` | Optional GitHub issue/OpenCode analysis pilot |
+| `factory demo --scenario running` | Live terminal redraw with simulated data |
 
 Other commands (run, onboard, update, serve, tui, logs) are **planned, not implemented**. They return a clear error rather than claiming execution.
 
@@ -88,3 +91,11 @@ just serve-docs
 ```
 
 The Markdown sources remain in `docs/`; generated static HTML is placed in `docs/site/` and deliberately Git-ignored. The PR Docs CI and GitHub Pages workflow both call **`just build-docs`**. GitHub Pages is configured to use **GitHub Actions** (rather than selecting `/docs` as a branch folder); its artifact is `docs/site/`.
+
+## Native binaries (no Go required)
+
+After a tagged prerelease is published, get a prebuilt Linux/Windows binary from [GitHub Releases](https://github.com/atstaeff/ai-factory-cli/releases). Install instructions for WSL and PowerShell: [release guide](docs/guides/releases.md). Native binary users can run `factory scan .`, `factory processes .` and `factory tools` without a Go toolchain. The `examples/` directory is not embedded in the binary.
+
+## Functional validation
+
+Start with [the WSL pilot](docs/guides/wsl-pilot.md) on a clean repository and an existing test issue. The opt-in `--execute` path invokes installed `gh` and `opencode` locally; BMAD execution is **not** implemented. [Terminal demo](docs/guides/terminal-demo.md) uses synthetic data only.
