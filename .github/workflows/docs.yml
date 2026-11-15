@@ -29,5 +29,11 @@ jobs:
       - uses: extractions/setup-just@v4
       - name: Install docs dependencies
         run: npm install --no-audit --no-fund
-      - name: Build site
+      - name: Validate main /docs branch Pages sources
+        run: |
+          test -s docs/index.md
+          test -s docs/_layouts/default.html
+          test -s docs/assets/css/theme.css
+          grep -q 'baseurl: "/ai-factory-cli"' docs/_config.yml
+      - name: Check Docusaurus compatibility build
         run: just build-docs
