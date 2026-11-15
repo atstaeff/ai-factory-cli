@@ -2,6 +2,10 @@ name: Release CLI binaries
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/release.yml'
     tags:
       - 'v*'
   workflow_dispatch:
@@ -40,6 +44,9 @@ jobs:
               exit 1
             fi
             VERSION="${INPUT_VERSION}"
+          elif [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            # One-time bootstrap: this workflow file changed on main.
+            VERSION="v0.1.0-rc.1"
           else
             VERSION="${GITHUB_REF_NAME}"
           fi
@@ -111,14 +118,18 @@ jobs:
           set -euo pipefail
           # Publish only from reviewed, existing Git tags. Never overwrite releases.
           if gh release view "${VERSION}" >/dev/null 2>&1; then
+            if [[ "${GITHUB_REF}" == "refs/heads/main" && "${GITHUB_EVENT_NAME}" == "push" ]]; then
+              echo "Bootstrap prerelease ${VERSION} already exists; nothing to do."
+              exit 0
+            fi
             echo "Release ${VERSION} already exists; refusing to overwrite" >&2
             exit 1
           fi
-          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" || "${GITHUB_REF}" == "refs/heads/main" ]]; then
             # Create a new tag pointing at the reviewed main commit.
             # GITHUB_TOKEN-created tags do not retrigger the tag workflow.
             if git ls-remote --tags "https://github.com/${GH_REPO}.git" "refs/tags/${VERSION}" | grep -q .; then
-              echo "Tag ${VERSION} already exists; refusing to reuse it in manual mode." >&2
+              echo "Tag ${VERSION} already exists; refusing to create a new release against an existing tag in this mode." >&2
               exit 1
             fi
             gh release create "${VERSION}" dist/* --prerelease --generate-notes --title "Factory ${VERSION}" --target "${GITHUB_SHA}"
