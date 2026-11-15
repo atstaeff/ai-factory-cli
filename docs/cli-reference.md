@@ -16,6 +16,8 @@ The installed binary is called **`factory`**, even though the GitHub repository 
 | `factory processes [path]` | Find named `PROCESS.md` files, including under `.factory/` |
 | `factory doctor [path]` | Minimal presence check for `.factory/PROCESS.md` |
 | `factory status [path]` | Explicitly reports that the supervisor is not implemented |
+| `factory pilot --repo X/Y --issue N --project PATH` | Local dry-run of GitHub issue analysis |
+| `factory pilot ... --execute` | Uses authenticated `gh` to read the issue and invokes `opencode run --agent plan` |
 
 ### Planned, not implemented
 
@@ -31,3 +33,5 @@ The installed binary is called **`factory`**, even though the GitHub repository 
 go test ./...
 go vet ./...
 ~~~
+
+WSL-specific real integration setup: [First brownfield pilot](./guides/wsl-pilot.md).
