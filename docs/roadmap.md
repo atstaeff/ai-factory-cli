@@ -15,7 +15,8 @@ title: Roadmap
 | Validated process schema | Planned |
 | Brownfield onboarding, updates and offboarding | Planned |
 | BMAD/OpenSpec runtime integration | Planned |
-| GitHub, Jira and custom enterprise CLI adapters | Planned |
+| GitHub issue read + OpenCode analysis pilot | Implemented in review branch, integration needs WSL acceptance test |
+| Jira and custom enterprise CLI adapters | Planned |
 | Scheduler, durable checkpoints and recovery | Planned |
 | Human-on-exception and resumption | Planned |
 | Terminal monitoring and model routing | Planned |
