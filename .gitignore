@@ -3,3 +3,8 @@
 *.test
 .coverage
 .DS_Store
+/node_modules/
+/build/
+/.docusaurus/
+/.cache/
+npm-debug.log*
