@@ -20,7 +20,8 @@ Usage:
   factory doctor [path]      Check required project configuration
   factory processes [path]   List discovered PROCESS.md definitions
   factory status [path]      Show project setup status
-  factory tools              Inspect local CLI availability (read only)\n  factory version            Print version
+  factory tools              Inspect local CLI availability (read only)
+  factory version            Print version
   factory help               Show help
 
 Execution, scheduling and integrations are NOT implemented yet.
@@ -38,7 +39,11 @@ func Execute(args []string, out, errOut io.Writer) error {
  command:=args[0]
  if command=="help" || command=="--help" || command=="-h" { _,e:=io.WriteString(out,usage); return e }
  if command=="version" { _,e:=fmt.Fprintln(out,"factory "+Version); return e }
- if command=="tools" {\n  if len(args)!=1 { return errors.New("tools takes no arguments") }\n  return checkTools(out)\n }\n if command!="scan" && command!="doctor" && command!="processes" && command!="status" {
+ if command=="tools" {
+  if len(args)!=1 { return errors.New("tools takes no arguments") }
+  return checkTools(out)
+ }
+ if command!="scan" && command!="doctor" && command!="processes" && command!="status" {
   return fmt.Errorf("unknown or not yet implemented command %q (run factory help)",command)
  }
  if len(args)>2 { return errors.New("expected at most one project path") }
