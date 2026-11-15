@@ -72,7 +72,7 @@ func Execute(args []string, out, errOut io.Writer) error {
 
 func inspect(root string) []Finding {
  items:=[]struct{name,path string}{
-  {"PROCESS.md","PROCESS.md"},
+  {"PROCESS.md",".factory/PROCESS.md"},
   {"BMAD","_bmad"},
   {"BMAD skills",".agents/skills"},
   {"OpenSpec","openspec"},
