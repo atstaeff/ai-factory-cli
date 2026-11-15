@@ -1,0 +1,15 @@
+title: AI Factory
+description: Process-driven AI work orchestration
+url: "https://atstaeff.github.io"
+baseurl: "/ai-factory-cli"
+markdown: kramdown
+highlighter: rouge
+exclude:
+  - site
+  - node_modules
+  - README.md
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

@@ -7,53 +7,45 @@ title: Contributing and documentation
 
 ## Engineering
 
-~~~bash
+```bash
 go test ./...
 go vet ./...
 go build -o factory ./cmd/factory
-~~~
+```
 
-Keep changes focused, make scans read-only, and describe unsupported commands truthfully. Follow [AGENTS.md](https://github.com/atstaeff/ai-factory-cli/blob/main/AGENTS.md).
+Keep changes focused, make scans read-only, and describe unsupported commands accurately. See [AGENTS.md](https://github.com/atstaeff/ai-factory-cli/blob/main/AGENTS.md).
 
 ## Documentation
 
-Docs live under `docs/`, powered by Docusaurus configured in the repo root.
+All public documentation sources are in `docs/`.
 
-~~~bash
+**Production publishing:** GitHub Pages uses its native branch-source Jekyll renderer. It publishes directly from `main` → `/docs`, with `docs/index.md` as the homepage, `docs/_layouts/default.html` for navigation and layout, and `docs/assets/css/theme.css` for the stefanposs.com-inspired theme.
+
+**Optional local Docusaurus compatibility build:** The repository still contains its original Docusaurus preview under `src/`, `sidebars.js` and `docusaurus.config.js`. This is separate from the Pages publishing path. `just build-docs` generates `docs/site/` for local testing; that generated directory is Git-ignored and is **not** the hosted Pages root.
+
+```bash
 npm install
-npm run start
 just build-docs
-~~~
+```
 
-The homepage is `src/pages/index.js`. Navigation uses `sidebars.js`. The shared theme is `src/css/custom.css`.
+## GitHub Pages setup: main /docs
 
-The PR workflow checks that the docs build; only pushes to `main` attempt deployment to GitHub Pages.
+Configure this once as a repository administrator:
 
-## GitHub Pages setup
+1. Open [Repository Settings → Pages](https://github.com/atstaeff/ai-factory-cli/settings/pages).
+2. Set **Build and deployment → Source: Deploy from a branch**.
+3. Select **Branch: main**, **Folder: /docs**, then **Save**.
+4. GitHub Pages builds Jekyll pages from the tracked Markdown and layout files and serves the generated `index.html` at [AI Factory Documentation](https://atstaeff.github.io/ai-factory-cli/).
 
-1. Repository **Settings → Pages**.
-2. Under **Build and deployment**, select **GitHub Actions** as the source.
-3. Ensure Actions are enabled and allow Pages deployment.
-4. Merge a reviewed PR into `main`; the deploy workflow publishes the generated `docs/site/` directory.
+The previous `Publish Docs to GitHub Pages` Actions workflow has been removed intentionally: it was configured for a different deployment model and GitHub rejected its attempt to modify the repository Pages setting (HTTP 403). The branch-based flow does not need that workflow.
 
-Docusaurus source files under `docs/` are **not themselves a deployable GitHub Pages website**. GitHub Pages serves the compiled static output. The intended public URL is `https://atstaeff.github.io/ai-factory-cli/` **only after a successful deployment**.
+## Troubleshooting
 
-:::caution Private repository
-The source repository is private. GitHub Pages availability and visibility depend on plan, settings and organizational policies. Do not deploy sensitive documentation; configure Pages visibility before publishing.
-:::
+A green Docusaurus CI check only shows that the optional preview builds; it does not guarantee a live GitHub Pages deployment. If the public site returns 404:
 
+- Check that the **publishing source is main /docs**, not main root or GitHub Actions.
+- Confirm `docs/index.md`, `docs/_config.yml`, and `docs/_layouts/default.html` exist on `main`.
+- Check the **Pages build/deployment status** under Actions and the Pages settings screen for any Jekyll compilation error.
+- Use the canonical URL `https://atstaeff.github.io/ai-factory-cli/` (with trailing slash).
 
-## Static output location
-
-`just build-docs` builds Docusaurus into `docs/site/` while keeping Markdown under `docs/`. The generated directory is Git-ignored; GitHub Actions uploads it to Pages. Do **not** set GitHub Pages to deploy from the `main` branch's `/docs` folder: that contains Markdown sources, not the built website. Use GitHub Actions as the Pages source.
-
-## Site deployment and 404 troubleshooting
-
-The `just build-docs` recipe produces `docs/site/index.html`; the `Publish Docs to GitHub Pages` workflow uploads that folder as its root artifact. It attempts to enable GitHub Pages and switch its `build_type` to `workflow`, then checks the public URL for an HTTP success and AI Factory content. If GitHub rejects automatic activation, verify **Settings → Pages → Build and deployment → Source: GitHub Actions** and inspect the failing Actions job. A green Docs CI does **not** mean Pages is deployed.
-
-The canonical URL is `https://atstaeff.github.io/ai-factory-cli/` (Docusaurus `baseUrl: '/ai-factory-cli/'`). Never point the Pages branch source at the Markdown-only `docs/` folder.
-
-
-### One-time required GitHub Pages setting
-
-On this repository GitHub reported `build_type: legacy`, and the workflow's token received HTTP 403 when trying to switch it to `workflow`. This permission cannot be overcome by changing build scripts. A repository administrator must visit [Settings → Pages](https://github.com/atstaeff/ai-factory-cli/settings/pages), choose **GitHub Actions** under **Build and deployment → Source**, and rerun [Publish Docs to GitHub Pages](https://github.com/atstaeff/ai-factory-cli/actions/workflows/pages.yml) on `main`. The workflow then uploads and verifies the generated site.
+The repository is public. Never include sensitive company information or credentials in documentation or generated examples.
