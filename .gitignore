@@ -1,0 +1,5 @@
+/factory
+*.exe
+*.test
+.coverage
+.DS_Store
